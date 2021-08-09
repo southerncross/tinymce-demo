@@ -10,7 +10,7 @@ export default function App() {
     }
   };
 
-  const initialValue = '<p>Name: <variable>username</variable></p>';
+  const initialValue = '<p>Hello, <variable>username</variable>, welcome!</p>';
   const [name, setName] = useState('username');
   const onVariableChange = (e) => {
     const value = e.target.value;
