@@ -10,22 +10,34 @@ export default function App() {
     }
   };
 
-  const initialValue = '<p>Hello, <variable>username</variable>, welcome!</p>';
+  const initialValue = `<p>Name: <span variable-type="text">username</span>!</p><p>Hello <img width="100" height="100" style="opacity: .2" src="${process.env.PUBLIC_URL}/approved.svg"/>world!</p>`;
   const [name, setName] = useState('username');
   const onVariableChange = (e) => {
     const value = e.target.value;
     setName(value);
     tinymce.walk(editorRef.current.getBody(), function(n) {
-      if (n.nodeType === 3 && n.parentNode && n.parentNode.tagName === 'VARIABLE') {
-        n.nodeValue = value;
+      if (n.nodeType === Node.TEXT_NODE && n.parentNode && n.parentNode.attributes['variable-type']) {
+        switch (n.parentNode.attributes['variable-type'].value) {
+          case 'text':
+            n.nodeValue = value;
+            break;
+          default:
+            break;
+        }
       }
     }, 'childNodes');
   }
   const onEditorChange = (newValue, editor) => {
     /*global tinymce*/
     tinymce.walk(editor.getBody(), function(n) {
-      if (n.nodeType === 3 && n.parentNode && n.parentNode.tagName === 'VARIABLE') {
-        setName(n.nodeValue);
+      if (n.nodeType === Node.TEXT_NODE && n.parentNode && n.parentNode.attributes['variable-type']) {
+        switch (n.parentNode.attributes['variable-type'].value) {
+          case 'text':
+            setName(n.nodeValue);
+            break;
+          default:
+            break;
+        }
       }
     }, 'childNodes');
   };
@@ -57,10 +69,9 @@ export default function App() {
             'alignright alignjustify | bullist numlist outdent indent | ' +
             'removeformat | help',
             content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }' +
-              'variable { padding: 4px; background-color: #e4e4e4 }',
+              'span[variable-type="text"] { padding: 4px; background-color: #e4e4e4 }',
             branding: false.valueOf,
-            extended_valid_elements: 'variable',
-            custom_elements: '~variable',
+            extended_valid_elements: 'span[variable-type]',
           }}
           onEditorChange={onEditorChange}
         />
